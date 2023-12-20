@@ -15,6 +15,9 @@ int main(void)
     ssize_t read;
     pid_t child_pid;
     int status;
+    char *token;
+    char *args[100];
+    int i = 0;
     while (1)
     {
         printf("$ ");
@@ -24,9 +27,6 @@ int main(void)
         if (line[read - 1] == '\n')
             line[read - 1] = '\0';
 
-        char *token;
-        char *args[100];
-        int i = 0;
         token = strtok(line, " ");
         while (token != NULL)
         {
