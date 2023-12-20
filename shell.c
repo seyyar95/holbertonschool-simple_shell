@@ -3,7 +3,6 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <string.h>
-
 /**
  * main - Simple UNIX command line interpreter
  *
@@ -16,7 +15,6 @@ int main(void)
     ssize_t read;
     pid_t child_pid;
     int status;
-
     while (1)
     {
         printf("$ ");
@@ -26,19 +24,16 @@ int main(void)
         if (line[read - 1] == '\n')
             line[read - 1] = '\0';
 
-        // Tokenize the input line
         char *token;
-        char *args[100];  // Adjust the size based on your needs
+        char *args[100];
         int i = 0;
-
         token = strtok(line, " ");
         while (token != NULL)
         {
             args[i++] = token;
             token = strtok(NULL, " ");
         }
-        args[i] = NULL;  // Set the last element to NULL
-
+        args[i] = NULL;
         child_pid = fork();
         if (child_pid == -1)
         {
@@ -56,7 +51,6 @@ int main(void)
         else
             wait(&status);
     }
-
     free(line);
     exit(EXIT_SUCCESS);
 }
