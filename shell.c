@@ -1,56 +1,94 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <sys/wait.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+
 /**
- * main - Simple UNIX command line interpreter
- *
- * Return: Always 0.
+ * Reads a command from the user and returns it as a string.
+ * Stores the command in memory through memory allocation.
+ * Memory should be freed after usage.
  */
+
+char *read_command(void)
+{
+	char *command = NULL;
+	size_t bufsize = 0;
+
+	ssize_t read_bytes = getline(&command, &bufsize, stdin);
+
+	if (read_bytes == -1)
+	{
+		free(command);
+		return (NULL);
+	}
+	if (command[read_bytes - 1] == '\n')
+		command[read_bytes - 1] = '\0';
+
+	return (command);
+}
+
+/**
+ * Executes the given command in a new process.
+ * Runs the command string using execve and waits for the process.
+ * Handles memory deallocation.
+ */
+
+void exec_command(char *command)
+{
+	pid_t pid = fork();
+
+	if (pid == -1)
+	{
+		perror("fork");
+		free(command);
+		exit(EXIT_FAILURE);
+	}
+	else if (pid == 0)
+	{
+		char *args[] = {command, NULL};
+
+		if (execve(command, args, NULL) == -1)
+		{
+			perror("execve");
+			free(command);
+			exit(EXIT_FAILURE);
+		}
+	}
+	else
+	{
+		waitpid(pid, NULL, 0);
+		free(command);
+	}
+}
+
+/**
+ * Displays a shell-like prompt for user input of a command.
+ * Clears the stdout and takes command input from the user.
+ * Calls read_command and exec_command functions to process the command.
+ */
+
 int main(void)
 {
-    char *line = NULL;
-    size_t len = 0;
-    ssize_t read;
-    pid_t child_pid;
-    int status;
-    char *token;
-    char *args[100];
-    int i = 0;
-    while (1)
-    {
-        printf("$ ");
-        read = getline(&line, &len, stdin);
-        if (read == -1)
-            break;
-        if (line[read - 1] == '\n')
-            line[read - 1] = '\0';
+	int is_piped = !isatty(fileno(stdin));
 
-        token = strtok(line, " ");
-        while (token != NULL)
-        {
-            args[i++] = token;
-            token = strtok(NULL, " ");
-        }
-        args[i] = NULL;
-        child_pid = fork();
-        if (child_pid == -1)
-        {
-            perror("Error");
-            return (1);
-        }
-        if (child_pid == 0)
-        {
-            if (execve(args[0], args, NULL) == -1)
-            {
-                perror("Error");
-                return (1);
-            }
-        }
-        else
-            wait(&status);
-    }
-    free(line);
-    exit(EXIT_SUCCESS);
+	while (1)
+	{
+		if (!is_piped)
+		{
+			printf("#cisfun$ ");
+			fflush(stdout);
+		}
+
+		char *command = read_command();
+
+		if (command == NULL)
+			break;
+
+		exec_command(command);
+	}
+	return (0);
 }
