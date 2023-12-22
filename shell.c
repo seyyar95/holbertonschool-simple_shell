@@ -48,12 +48,20 @@ void exec_command(char *command)
 		exit(EXIT_FAILURE);
 	}
 	else if (pid == 0)
-	{
-		char *args[2];
-		args[0] = command;
-		args[1] = NULL;
+	  {char *args[64]; // Maksimum 64 argüman varsayımı
+		int arg_count = 0;
+		char *token;
 
-		if (execve(command, args, NULL) == -1)
+		token = strtok(command, " ");
+
+		while (token != NULL && arg_count < 63)
+		{
+			args[arg_count++] = token;
+			token = strtok(NULL, " ");
+		}
+		args[arg_count] = NULL;
+
+		if (execve(args[0], args, NULL) == -1)
 		{
 			perror("execve");
 			free(command);
