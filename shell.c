@@ -7,11 +7,13 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
+
 /**
- * Reads a command from the user and returns it as a string.
- * Stores the command in memory through memory allocation.
- * Memory should be freed after usage.
+ * read_command - Reads a command from the user and returns it as a string.
+ * Return:
+ *   Returns the command string or NULL on failure/EOF.
  */
+
 
 char *read_command(void)
 {
@@ -25,24 +27,49 @@ char *read_command(void)
 		free(command);
 		return (NULL);
 	}
-	if (command[0] == '\n')
-	{
-		free(command);
-		return (strdup(""));
-	}
 	if (command[read_bytes - 1] == '\n')
 		command[read_bytes - 1] = '\0';
 
 	return (command);
 }
 
+
 /**
- * Executes the given command in a new process.
- * Runs the command string using execve and waits for the process.
- * Handles memory deallocation.
+ * parse_arguments - Splits 'command' into separate arguments.
+ * @command: Command string to be parsed.
+ * @args: Array to store the extracted arguments.
+ *
+ * Uses strtok to tokenize 'command' by spaces into 'args'.
+ * Limits the maximum number of arguments to 63.
+ * Terminates 'args' array with NULL.
  */
 
-void exec_command(char *command)
+void parse_arguments(char *command, char **args)
+{
+	int arg_count = 0;
+	char *token;
+
+	token = strtok(command, " ");
+
+	while (token != NULL && arg_count < 63)
+	{
+		args[arg_count++] = token;
+		token = strtok(NULL, " ");
+	}
+	args[arg_count] = NULL;
+}
+
+/**
+ * execute_command - Executes a command and waits for its completion.
+ * @command: Command string to execute.
+ *
+ * Creates a child process to execute 'command'.
+ * Parses it into separate arguments using execve.
+ * Parent waits for child to complete and frees allocated memory.
+ */
+
+
+void execute_command(char *command)
 {
 	pid_t pid = fork();
 
@@ -55,17 +82,14 @@ void exec_command(char *command)
 	else if (pid == 0)
 	{
 		char *args[64];
-		int arg_count = 0;
-		char *token;
 
-		token = strtok(command, " ");
+		parse_arguments(command, args);
 
-		while (token != NULL && arg_count < 63)
+		if (args[0] == NULL)
 		{
-			args[arg_count++] = token;
-			token = strtok(NULL, " ");
+			free(command);
+			exit(EXIT_SUCCESS);
 		}
-		args[arg_count] = NULL;
 
 		if (execve(args[0], args, NULL) == -1)
 		{
@@ -81,16 +105,25 @@ void exec_command(char *command)
 	}
 }
 
+
 /**
- * Displays a shell-like prompt for user input of a command.
- * Clears the stdout and takes command input from the user.
- * Calls read_command and exec_command functions to process the command.
+ * main - Basic shell interface for continuous command execution.
+ *
+ * Description:
+ *   Prompts and executes user commands in a shell interface.
+ *   Displays '#cisfun$ ' when not receiving input from a pipe,
+ *   reads user input as commands, and executes them until exit/EOF.
+ *
+ * Return:
+ *   Always returns 0 for successful completion.
  */
+
 
 int main(void)
 {
 	int is_piped = !isatty(fileno(stdin));
 	char *command;
+
 	while (1)
 	{
 		if (!is_piped)
@@ -104,7 +137,7 @@ int main(void)
 		if (command == NULL)
 			break;
 
-		exec_command(command);
+		execute_command(command);
 	}
 	return (0);
 }
