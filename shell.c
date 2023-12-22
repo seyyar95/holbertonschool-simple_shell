@@ -48,7 +48,8 @@ void exec_command(char *command)
 		exit(EXIT_FAILURE);
 	}
 	else if (pid == 0)
-	  {char *args[64]; // Maksimum 64 argüman varsayımı
+	{
+		char *args[64];
 		int arg_count = 0;
 		char *token;
 
