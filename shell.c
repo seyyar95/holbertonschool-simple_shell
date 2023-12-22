@@ -49,7 +49,9 @@ void exec_command(char *command)
 	}
 	else if (pid == 0)
 	{
-		char *args[] = {command, NULL};
+		char *args[2];
+		args[0] = command;
+		args[1] = NULL;
 
 		if (execve(command, args, NULL) == -1)
 		{
@@ -74,7 +76,7 @@ void exec_command(char *command)
 int main(void)
 {
 	int is_piped = !isatty(fileno(stdin));
-
+	char *command;
 	while (1)
 	{
 		if (!is_piped)
@@ -83,7 +85,7 @@ int main(void)
 			fflush(stdout);
 		}
 
-		char *command = read_command();
+		command = read_command();
 
 		if (command == NULL)
 			break;
