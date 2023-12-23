@@ -44,3 +44,18 @@ file1 file2 file3
 
 .SH AUTHORS
 Written by Sayyar Heydarov and Hamid Hamidbeyli.
+
+.SH SEE ALSO
+The \fBshell\fP program is a basic shell interface. For more information on the functions and system calls used in this shell, refer to the following manual pages:
+
+.BR fork(2),
+.BR waitpid(2),
+.BR execve(2),
+.BR getline(3),
+.BR strtok(3),
+.BR isatty(3),
+.BR fflush(3),
+.BR free(3),
+.BR perror(3).
+
+Additionally, for general information on Unix commands and system calls, see the respective manual pages or online documentation.
