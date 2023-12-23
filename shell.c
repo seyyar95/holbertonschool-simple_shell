@@ -45,11 +45,14 @@ int main(void)
             if (execve(args[0], args, NULL) == -1)
             {
                 perror("Error");
-                return (1);
+                exit(100);
             }
         }
         else
+	{
             wait(&status);
+	    i = 0;
+	}
     }
     free(line);
     exit(EXIT_SUCCESS);
