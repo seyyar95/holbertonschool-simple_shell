@@ -1,0 +1,46 @@
+.TH SHELL 1 "December 2023" "Version 1.0" "User Commands"
+
+.SH NAME
+shell \- a basic shell interface for continuous command execution
+
+.SH SYNOPSIS
+.B shell
+
+.SH DESCRIPTION
+The \fBshell\fP program is a simple shell interface that allows users to execute commands continuously. It prompts and executes user commands until the user exits or encounters an end-of-file (EOF).
+
+When executed without any arguments, \fBshell\fP displays the command prompt "#cisfun$ " and waits for user input. It then reads the user's command, executes it, and repeats the process until the user exits.
+
+If \fBshell\fP is receiving input from a pipe, it omits the command prompt and continuously reads and executes commands from the input stream.
+
+.SH COMMANDS
+.TP
+.B exit
+Exits the \fBshell\fP shell.
+
+.SH INTERACTIVE MODE
+In interactive mode, \fBshell\fP provides a command prompt for the user to enter commands. It displays "#cisfun$ " and waits for the user to input a command. The user can enter any valid shell command, and \fBshell\fP will execute it.
+
+.SH NON-INTERACTIVE MODE
+When \fBshell\fP is part of a pipeline and receiving input from a pipe, it operates in non-interactive mode. In this mode, it continuously reads commands from the input stream and executes them without displaying the command prompt.
+
+.SH RETURN VALUE
+The \fBshell\fP program always returns 0 upon successful completion.
+
+.SH EXAMPLES
+.TP
+.B 1.
+Run \fBshell\fP interactively:
+.BR $ shell
+BR #cisfun$ ls
+file1 file2 file3
+BR #cisfun$ exit
+
+.TP
+.B 2.
+Use \fBshell\fP in a pipeline:
+.BR $ echo "ls" | shell
+file1 file2 file3
+
+.SH AUTHORS
+Written by Sayyar Heydarov and Hamid Hamidbeyli.
