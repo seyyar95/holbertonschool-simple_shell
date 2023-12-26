@@ -90,7 +90,6 @@ void execute_command(char *command)
 			free(command);
 			exit(EXIT_SUCCESS);
 		}
-
 		if (execve(args[0], args, NULL) == -1)
 		{
 			perror("execve");
@@ -140,11 +139,19 @@ int main(void)
 		{
 			break;
 		}
-
-		if (strcmp(command, "exit") == 0)
+		if (strncmp(command, "exit", 4) == 0)
 		{
 			free(command);
-			exit(0);
+			char *exit_value = command + 4;
+			if (*exit_value == '\0')
+			{
+				exit(0);
+			}
+			else
+			{
+				int exit_num = atoi(exit_value);
+				exit(exit_num);
+			}
 		}
 
 		execute_command(command);
