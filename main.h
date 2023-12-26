@@ -14,7 +14,5 @@ char *read_command(void);
 void parse_arguments(char *command, char **args);
 void execute_command(char *command);
 int main(void);
-int env_builtin(char *command);
-void print_environment();
 
 #endif

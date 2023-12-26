@@ -135,11 +135,6 @@ int main(void)
 			exit(0);
 		}
 
-		if (env_builtin(command))
-		{
-			print_environment();
-		}
-
 		execute_command(command);
 	}
 	return (0);
