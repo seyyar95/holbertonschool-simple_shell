@@ -27,6 +27,11 @@ char *read_command(void)
 		free(command);
 		return (NULL);
 	}
+	if (strcmp(command, "exit\n") == 0)
+	{
+		free(command);
+		exit(EXIT_SUCCESS);
+	}
 	if (command[read_bytes - 1] == '\n')
 		command[read_bytes - 1] = '\0';
 
