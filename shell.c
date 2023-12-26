@@ -122,8 +122,8 @@ void execute_command(char *command)
 
 int main(void)
 {
-	int exit_num, is_piped = !isatty(fileno(stdin));
-	char *command, *exit_value;
+	int is_piped = !isatty(fileno(stdin));
+	char *command;
 
 	while (1)
 	{
@@ -139,19 +139,10 @@ int main(void)
 		{
 			break;
 		}
-		if (strncmp(command, "exit", 4) == 0)
+		if (strcmp(command, "exit") == 0)
 		{
 			free(command);
-			exit_value = command + 4;
-			if (*exit_value == '\0')
-			{
-				exit(0);
-			}
-			else
-			{
-				exit_num = atoi(exit_value);
-				exit(exit_num);
-			}
+			exit(0);
 		}
 
 		execute_command(command);
