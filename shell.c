@@ -27,10 +27,15 @@ char *read_command(void)
 		free(command);
 		return (NULL);
 	}
-	if (strcmp(command, "exit\n") == 0)
+	if (access(command,F_OK) == -1 && strcmp(command, "exit\n") ==0)
 	{
 		free(command);
-	  	exit(2);
+		exit(2);
+	}
+	if (strcmp(command, "exit\n") ==0)
+	{
+		free(command);
+	  	exit(0);
 	}
 	if (command[read_bytes - 1] == '\n')
 		command[read_bytes - 1] = '\0';
