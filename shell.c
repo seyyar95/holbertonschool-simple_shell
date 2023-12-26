@@ -59,6 +59,24 @@ void parse_arguments(char *command, char **args)
 	args[arg_count] = NULL;
 }
 
+int env_builtin(char *command)
+{
+    return (strcmp(command, "env") == 0);
+}
+
+void print_environment()
+{
+    extern char **environ;
+    char **env;
+    for (env = environ; *env != NULL; env++)
+    {
+        printf("%s\n", *env);
+    }
+}
+
+
+
+
 /**
  * execute_command - Executes a command and waits for its completion.
  * @command: Command string to execute.
@@ -143,6 +161,11 @@ int main(void)
 		{
 			free(command);
 			exit(0);
+		}
+
+		if (env_builtin(command))
+		{
+			print_environment();
 		}
 
 		execute_command(command);
