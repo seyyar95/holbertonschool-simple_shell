@@ -27,16 +27,19 @@ char *read_command(void)
 		free(command);
 		return (NULL);
 	}
-	if (access(command,F_OK) == -1 && strcmp(command, "exit\n") ==0)
+	if (strcmp(command, "exit\n") == 0)
 	{
-		free(command);
-		exit(2);
-	}
-	if (strcmp(command, "exit\n") ==0)
-	{
-		free(command);
-	  	exit(0);
-	}
+		if (strchr(command, ' ') != NULL)
+		{
+            free(command);
+            exit(2);
+        }
+		else
+		{
+            free(command);
+            exit(0);
+        }
+    }
 	if (command[read_bytes - 1] == '\n')
 		command[read_bytes - 1] = '\0';
 
