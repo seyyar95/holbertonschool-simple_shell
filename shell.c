@@ -100,7 +100,9 @@ void execute_command(char *command)
 	}
 	else
 	{
-		waitpid(pid, NULL, 0);
+		int status;
+
+		waitpid(pid, &status, 0);
 		free(command);
 	}
 }
@@ -142,7 +144,7 @@ int main(void)
 		if (strcmp(command, "exit") == 0)
 		{
 			free(command);
-			break;
+			exit(0);
 		}
 
 		execute_command(command);
