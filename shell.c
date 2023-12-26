@@ -32,12 +32,12 @@ char *read_command(void)
 		if (system(command) != 0)
 		{
 			free(command);
-			exit(2);
+			exit(0);
 		}
 		else
 		{
 			free(command);
-			exit(0);
+			exit(2);
 		}
 	}
 	if (command[read_bytes - 1] == '\n')
