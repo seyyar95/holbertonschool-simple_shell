@@ -89,7 +89,13 @@ void parse_arguments(char *command, char **args) {
 
 
 int command_exists(const char *command) {
-    if (strchr(command, '/') != NULL) {
+    char *path_env = getenv("PATH");
+    char *path_copy = strdup(path_env);
+    char *path_dir;
+    char full_path[MAX_PATH_LENGTH];
+
+	
+  if (strchr(command, '/') != NULL) {
          if (access(command, F_OK) == 0) {
             return 1;
         } else {
@@ -97,16 +103,11 @@ int command_exists(const char *command) {
         }
     }
 
-    char *path_env = getenv("PATH");
-    char *path_copy = strdup(path_env);
-
-    if (path_copy == NULL) {
+   if (path_copy == NULL) {
         perror("strdup");
         exit(EXIT_FAILURE);
     }
 
-    char *path_dir;
-    char full_path[MAX_PATH_LENGTH];
 
     path_dir = strtok(path_copy, ":");
     while (path_dir != NULL) {
