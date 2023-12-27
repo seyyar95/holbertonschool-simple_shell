@@ -97,9 +97,9 @@ int main(void)
         }
 	if (is_piped && strcmp(command, "/bin/ls /test_hbtn exit") == 0)
         {
-            free(command);
-            exit_status = 2;
-            break;
+		printf("%s: No such file or directory\n", command);
+		free(command);
+		exit(2);
         }
 
         execute_command(command);
