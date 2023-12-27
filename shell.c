@@ -1,7 +1,7 @@
 #include "main.h"
 
-extern char **environ;
 #define MAX_ARGS 64
+#define MAX_PATH_LENGTH 1024
 
 /**
  * read_command - Reads a command from the user and returns it as a string.
@@ -62,47 +62,64 @@ void parse_arguments(char *command, char **args)
  * Parses it into separate arguments using execve.
  * Parent waits for child to complete and frees allocated memory.
  */
+int command_exists(const char *command) {
+    char *path_env = getenv("PATH");
+    char *path_copy = strdup(path_env);
 
-void execute_command(char *command) {
-    pid_t pid;
-
-    int is_empty_command = 1, i;
-    for (i = 0; command[i] != '\0'; i++) {
-        if (command[i] != ' ' && command[i] != '\t' && command[i] != '\n') {
-            is_empty_command = 0;
-            break;
-        }
+    if (path_copy == NULL) {
+        perror("strdup");
+        exit(EXIT_FAILURE);
     }
 
-    if (command != NULL && !is_empty_command) {
-        pid = fork();
+    char *path_dir = strtok(path_copy, ":");
+    while (path_dir != NULL) {
+        char full_path[MAX_PATH_LENGTH];
+        snprintf(full_path, sizeof(full_path), "%s/%s", path_dir, command);
 
-        if (pid == -1) {
-            perror("fork");
-            free(command);
-            exit(EXIT_FAILURE);
-        } else if (pid == 0) {
-            char *args[2]; 
-
-            args[0] = command;
-            args[1] = NULL;
-
-            if (execve(command, args, NULL) == -1) {
-	            char *fallback_command = "/bin/ls";
-                args[0] = fallback_command;
-                execve(fallback_command, args, NULL);
-
-                perror("execve");
-                free(command);
-                exit(EXIT_FAILURE);
-            }
-        } else {
-            waitpid(pid, NULL, 0);
-            free(command);
+        if (access(full_path, F_OK) == 0) {
+            free(path_copy);
+            return 1; // Command found in this path directory
         }
+
+        path_dir = strtok(NULL, ":");
     }
+
+    free(path_copy);
+    return 0; // Command not found in any path directory
 }
 
+void execute_command(char *command) {
+    if (!command_exists(command)) {
+        printf("%s: command not found\n", command);
+        free(command);
+        return;
+    }
+
+    pid_t pid = fork();
+
+    if (pid == -1) {
+        perror("fork");
+        free(command);
+        exit(EXIT_FAILURE);
+    } else if (pid == 0) {
+        char *args[MAX_ARGS];
+        parse_arguments(command, args);
+
+        if (args[0] == NULL) {
+            free(command);
+            exit(EXIT_SUCCESS);
+        }
+
+        if (execvp(args[0], args) == -1) {
+            perror("execvp");
+            free(command);
+            exit(EXIT_FAILURE);
+        }
+    } else {
+        waitpid(pid, NULL, 0);
+        free(command);
+    }
+}
 
 /**
  * main - Basic shell interface for continuous command execution.
