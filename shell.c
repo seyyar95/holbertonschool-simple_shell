@@ -9,20 +9,28 @@
 
 char *read_command(void)
 {
-	char *command = NULL;
-	size_t bufsize = 0;
+        char *command = NULL;
+        size_t bufsize = 0;
+        int i = 0;
+        ssize_t read_bytes = getline(&command, &bufsize, stdin);
 
-	ssize_t read_bytes = getline(&command, &bufsize, stdin);
 
-	if (read_bytes == -1)
-	{
-		free(command);
-		return (NULL);
-	}
-	if (command[read_bytes - 1] == '\n')
-		command[read_bytes - 1] = '\0';
+        if (read_bytes > 0 && command[read_bytes - 1] == '\n') {
+        command[read_bytes - 1] = '\0';
+    }
 
-	return (command);
+            if (strcmp(command, "exit") == 0) {
+        free(command);
+        exit(0);
+    }
+
+    if (access(command, F_OK) == -1) {
+        perror("Error checking command existence");
+        free(command);
+        exit(2);
+    }
+
+    return command;
 }
 
 
@@ -38,17 +46,17 @@ char *read_command(void)
 
 void parse_arguments(char *command, char **args)
 {
-	int arg_count = 0;
-	char *token;
+        int arg_count = 0;
+        char *token;
 
-	token = strtok(command, " ");
+        token = strtok(command, " ");
 
-	while (token != NULL && arg_count < 63)
-	{
-		args[arg_count++] = token;
-		token = strtok(NULL, " ");
-	}
-	args[arg_count] = NULL;
+        while (token != NULL && arg_count < 63)
+        {
+                args[arg_count++] = token;
+                token = strtok(NULL, " ");
+        }
+        args[arg_count] = NULL;
 }
 
 /**
@@ -61,40 +69,54 @@ void parse_arguments(char *command, char **args)
  */
 
 
-void execute_command(char *command)
-{
-	pid_t pid = fork();
+void execute_command(char *command) {
+    pid_t pid = fork();
 
-	if (pid == -1)
-	{
-		perror("fork");
-		free(command);
-		exit(EXIT_FAILURE);
-	}
-	else if (pid == 0)
-	{
-		char *args[64];
+    if (pid == -1) {
+        perror("fork");
+        free(command);
+        exit(EXIT_FAILURE);
+    } else if (pid == 0) {
+        char *args[64];
 
-		parse_arguments(command, args);
+        parse_arguments(command, args);
 
-		if (args[0] == NULL)
-		{
-			free(command);
-			exit(EXIT_SUCCESS);
-		}
-		if (execve(args[0], args, NULL) == -1)
-		{
-			perror("execve");
-			free(command);
-			exit(EXIT_FAILURE);
-		}
-	}
-	else
-	{
-		waitpid(pid, NULL, 0);
-		free(command);
-	}
+        if (args[0] == NULL) {
+            free(command);
+            exit(EXIT_SUCCESS);
+        }
+
+        if (strcmp(args[0], "exit") == 0) {
+            // 'exit' komutu sadece bellek temizliği yaparak işleme alınıyor
+            free(command);
+            exit(EXIT_SUCCESS);
+        }
+
+        if (execve(args[0], args, NULL) == -1) {
+            perror("execve");
+            free(command);
+            exit(EXIT_FAILURE);
+        }
+    } else {
+        int status;
+
+        waitpid(pid, &status, 0);
+
+        // Eğer çocuk process exit komutu ile sonlandıysa, status değerini 0 yap
+        if (WIFEXITED(status) && WEXITSTATUS(status) == 0 && strcmp(command, "exit") == 0) {
+            status = 0;
+        }
+
+        free(command);
+
+        // 'exit' komutu girildiğinde çocuk process'i sonlandırmadan doğrudan dönebiliriz
+        if (strcmp(command, "exit") == 0) {
+            exit(status);
+        }
+    }
 }
+
+
 
 
 /**
@@ -112,30 +134,25 @@ void execute_command(char *command)
 
 int main(void)
 {
-	int is_piped = !isatty(fileno(stdin));
-	char *command;
+        int is_piped = !isatty(fileno(stdin));
+        char *command;
 
-	while (1)
-	{
-		if (!is_piped)
-		{
-			printf("#cisfun$ ");
-			fflush(stdout);
-		}
+        while (1)
+        {
+                if (!is_piped)
+                {
+                        printf("#cisfun$ ");
+                        fflush(stdout);
+                }
 
-		command = read_command();
+                command = read_command();
 
-		if (command == NULL)
-		{
-			break;
-		}
-		if (strcmp(command, "exit") == 0)
-		{
-			free(command);
-			exit(0);
-		}
+                if (command == NULL)
+                {
+                        break;
+                }
 
-		execute_command(command);
-	}
-	return (0);
+                execute_command(command);
+        }
+        return (0);
 }
