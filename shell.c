@@ -1,5 +1,8 @@
 #include "main.h"
 
+extern char **environ;
+#define MAX_ARGS 64
+
 /**
  * read_command - Reads a command from the user and returns it as a string.
  * Return:
@@ -61,52 +64,76 @@ void parse_arguments(char *command, char **args)
  */
 
 
-void execute_command(char *command)
-{
-	pid_t pid = fork();
+void execute_absolute_command(char *command) {
+    char *args[MAX_ARGS];
+    parse_arguments(command, args);
 
-	if (pid == -1)
-	{
-		perror("fork");
-		free(command);
-		exit(EXIT_FAILURE);
-	}
-	else if (pid == 0)
-	{
-		char *args[64];
+    if (args[0] == NULL) {
+        free(command);
+        exit(EXIT_SUCCESS);
+    }
 
-		parse_arguments(command, args);
+    if (strcmp(args[0], "env") == 0) {
+        char **env = environ;
+        while (*env != NULL) {
+            printf("%s\n", *env);
+            env++;
+        }
+        free(command);
+        exit(EXIT_SUCCESS);
+    }
 
-		if (args[0] == NULL)
-		{
-			free(command);
-			exit(EXIT_SUCCESS);
-		}
-
-		if (strcmp(args[0], "env") == 0)
-		{
-			char **env = environ;
-			while(*env != NULL)
-			{
-				printf("%s\n", *env);
-				env++;
-			}
-			free(command);
-			exit(EXIT_SUCCESS);
-		}
-		if (execve(args[0], args, NULL) == -1)
-		{
-			perror("execve");
-			free(command);
-			exit(EXIT_FAILURE);
-		}
-	}
-	else
-	{
-		waitpid(pid, NULL, 0);
-		free(command);
-	}
+    if (execve(args[0], args, NULL) == -1) {
+        perror("execve");
+        free(command);
+        exit(EXIT_FAILURE);
+    }
 }
+
+void execute_command(char *command) {
+    pid_t pid = fork();
+
+    if (pid == -1) {
+        perror("fork");
+        free(command);
+        exit(EXIT_FAILURE);
+    } else if (pid == 0) {
+        char *args[MAX_ARGS];
+        parse_arguments(command, args);
+
+        if (args[0] == NULL) {
+            free(command);
+            exit(EXIT_SUCCESS);
+        }
+
+        if (args[0][0] == '/') {
+            execute_absolute_command(command);
+        } else {
+            char *path = getenv("PATH");
+            char *token = strtok(path, ":");
+
+            while (token != NULL) {
+                char *cmd_path = malloc(strlen(token) + strlen(args[0]) + 2);
+                sprintf(cmd_path, "%s/%s", token, args[0]);
+
+                if (access(cmd_path, X_OK) == 0) {
+                    execute_absolute_command(cmd_path);
+                }
+
+                free(cmd_path);
+                token = strtok(NULL, ":");
+            }
+
+            fprintf(stderr, "Command not found: %s\n", args[0]);
+            free(command);
+            exit(EXIT_FAILURE);
+        }
+    } else {
+        waitpid(pid, NULL, 0);
+        free(command);
+    }
+}
+
 
 
 /**
