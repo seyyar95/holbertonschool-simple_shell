@@ -78,14 +78,14 @@ int command_exists(const char *command) {
 
         if (access(full_path, F_OK) == 0) {
             free(path_copy);
-            return 1; // Command found in this path directory
+            return 1;
         }
 
         path_dir = strtok(NULL, ":");
     }
 
     free(path_copy);
-    return 0; // Command not found in any path directory
+    return 0;
 }
 
 void execute_command(char *command) {
