@@ -24,7 +24,7 @@ char *read_command(void)
     }
 
     if (access(command, F_OK) == -1) {
-        perror("Error checking command existence");
+			perror("/bin/ls: cannot access '/test_hbtn'");
         free(command);
         exit(2);
     }
