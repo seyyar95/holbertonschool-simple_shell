@@ -66,8 +66,8 @@ void parse_arguments(char *command, char **args)
 void execute_command(char *command) {
     pid_t pid;
 
-    int is_empty_command = 1;
-    for (int i = 0; command[i] != '\0'; i++) {
+    int is_empty_command = 1, i;
+    for (i = 0; command[i] != '\0'; i++) {
         if (command[i] != ' ' && command[i] != '\t' && command[i] != '\n') {
             is_empty_command = 0;
             break;
