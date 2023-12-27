@@ -1,5 +1,7 @@
 #include "main.h"
 
+extern char **environ;
+#define MAX_ARGS 64
 
 /**
  * read_command - Reads a command from the user and returns it as a string.
@@ -61,52 +63,49 @@ void parse_arguments(char *command, char **args)
  * Parent waits for child to complete and frees allocated memory.
  */
 
+void execute_command(char *command) {
+    pid_t pid;
 
-void execute_command(char *command)
-{
-	pid_t pid = fork();
+    // Check if command is empty or consists of only spaces
+    int is_empty_command = 1;
+    for (int i = 0; command[i] != '\0'; i++) {
+        if (command[i] != ' ' && command[i] != '\t' && command[i] != '\n') {
+            is_empty_command = 0;
+            break;
+        }
+    }
 
-	if (pid == -1)
-	{
-		perror("fork");
-		free(command);
-		exit(EXIT_FAILURE);
-	}
-	else if (pid == 0)
-	{
-		char *args[64];
+    if (command != NULL && !is_empty_command) {
+        pid = fork();
 
-		parse_arguments(command, args);
+        if (pid == -1) {
+            perror("fork");
+            free(command);
+            exit(EXIT_FAILURE);
+        } else if (pid == 0) {
+            char *args[2]; // Arguments for ls command (including command and NULL terminator)
 
-		if (args[0] == NULL)
-		{
-			free(command);
-			exit(EXIT_SUCCESS);
-		}
+            // Parse the command into arguments
+            args[0] = command;
+            args[1] = NULL;
 
-		if (strcmp(args[0], "env") == 0)
-		{
-			char **env = environ;
-			while(*env != NULL)
-			{
-				printf("%s\n", *env);
-				env++;
-			}
-			free(command);
-			exit(EXIT_SUCCESS);
-		}
-		if (execve(args[0], args, NULL) == -1)
-		{
-			perror("execve");
-			free(command);
-			exit(EXIT_FAILURE);
-		}
-	}
-	else
-	{
-		waitpid(pid, NULL, 0);
-		free(command);
-	}
+            // Execute the command directly
+            if (execve(command, args, NULL) == -1) {
+                // If execve fails, try with /bin/ls
+                char *fallback_command = "/bin/ls";
+                args[0] = fallback_command;
+                execve(fallback_command, args, NULL);
+
+                // If both execve attempts fail, print an error
+                perror("execve");
+                free(command);
+                exit(EXIT_FAILURE);
+            }
+        } else {
+            waitpid(pid, NULL, 0);
+            free(command);
+        }
+    }
 }
 
 
