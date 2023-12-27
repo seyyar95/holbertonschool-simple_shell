@@ -63,24 +63,28 @@ void parse_arguments(char *command, char **args)
  * Parent waits for child to complete and frees allocated memory.
  */
 
+
 int command_exists(const char *command) {
-    char *path_env = getenv("PATH");
-    char *path_copy = strdup(path_env);
+    char *path_env;
+    char *path_copy;
+    char *path_dir;
+    char full_path[MAX_PATH_LENGTH];
+
+    path_env = getenv("PATH");
+    path_copy = strdup(path_env);
 
     if (path_copy == NULL) {
         perror("strdup");
         exit(EXIT_FAILURE);
     }
 
-    char *path_dir;
     path_dir = strtok(path_copy, ":");
     while (path_dir != NULL) {
-        char full_path[MAX_PATH_LENGTH];
         snprintf(full_path, sizeof(full_path), "%s/%s", path_dir, command);
 
         if (access(full_path, F_OK) == 0) {
             free(path_copy);
-            return 1; 
+            return 1;
         }
 
         path_dir = strtok(NULL, ":");
@@ -89,6 +93,7 @@ int command_exists(const char *command) {
     free(path_copy);
     return 0;
 }
+
 void execute_command(char *command) {
     pid_t pid;
     char *args[MAX_ARGS];
