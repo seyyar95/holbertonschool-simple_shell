@@ -39,19 +39,42 @@ char *read_command(void)
  * Terminates 'args' array with NULL.
  */
 
-void parse_arguments(char *command, char **args)
-{
-	int arg_count = 0;
-	char *token;
+void parse_arguments(char *command, char **args) {
+    int arg_count = 0;
+    char *token;
+    const char *delimiters = " \t\n";
+	char *end_quote;
+	size_t len;
 
-	token = strtok(command, " ");
+    token = strtok(command, delimiters);
 
-	while (token != NULL && arg_count < 63)
-	{
-		args[arg_count++] = token;
-		token = strtok(NULL, " ");
-	}
-	args[arg_count] = NULL;
+    while (token != NULL && arg_count < MAX_ARGS - 1) {
+         if (token[0] == '\"') {
+            end_quote = strchr(token + 1, '\"');
+            while (end_quote == NULL && arg_count < MAX_ARGS - 1) {
+                args[arg_count] = token;
+                arg_count++;
+
+                token = strtok(NULL, delimiters);
+                if (token == NULL) break;
+
+                end_quote = strchr(token, '\"');
+            }
+
+            if (end_quote != NULL) {
+                len = end_quote - token + 1;
+                args[arg_count] = malloc(len);
+                strncpy(args[arg_count], token, len - 1);
+                args[arg_count][len - 1] = '\0';
+                arg_count++;
+            }
+        } else {
+            args[arg_count] = strdup(token);
+            arg_count++;
+            token = strtok(NULL, delimiters);
+        }
+    }
+    args[arg_count] = NULL;
 }
 
 /**
@@ -64,19 +87,26 @@ void parse_arguments(char *command, char **args)
  */
 
 
-int command_exists(const char *command) {
-    char *path_env;
-    char *path_copy;
-    char *path_dir;
-    char full_path[MAX_PATH_LENGTH];
 
-    path_env = getenv("PATH");
-    path_copy = strdup(path_env);
+int command_exists(const char *command) {
+    if (strchr(command, '/') != NULL) {
+         if (access(command, F_OK) == 0) {
+            return 1;
+        } else {
+		  return 0;
+        }
+    }
+
+    char *path_env = getenv("PATH");
+    char *path_copy = strdup(path_env);
 
     if (path_copy == NULL) {
         perror("strdup");
         exit(EXIT_FAILURE);
     }
+
+    char *path_dir;
+    char full_path[MAX_PATH_LENGTH];
 
     path_dir = strtok(path_copy, ":");
     while (path_dir != NULL) {
@@ -93,6 +123,8 @@ int command_exists(const char *command) {
     free(path_copy);
     return 0;
 }
+
+
 
 void execute_command(char *command) {
     pid_t pid;
