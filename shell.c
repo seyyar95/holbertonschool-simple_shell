@@ -66,7 +66,6 @@ void parse_arguments(char *command, char **args)
 void execute_command(char *command) {
     pid_t pid;
 
-    // Check if command is empty or consists of only spaces
     int is_empty_command = 1;
     for (int i = 0; command[i] != '\0'; i++) {
         if (command[i] != ' ' && command[i] != '\t' && command[i] != '\n') {
@@ -83,20 +82,16 @@ void execute_command(char *command) {
             free(command);
             exit(EXIT_FAILURE);
         } else if (pid == 0) {
-            char *args[2]; // Arguments for ls command (including command and NULL terminator)
+            char *args[2]; 
 
-            // Parse the command into arguments
             args[0] = command;
             args[1] = NULL;
 
-            // Execute the command directly
             if (execve(command, args, NULL) == -1) {
-                // If execve fails, try with /bin/ls
-                char *fallback_command = "/bin/ls";
+	            char *fallback_command = "/bin/ls";
                 args[0] = fallback_command;
                 execve(fallback_command, args, NULL);
 
-                // If both execve attempts fail, print an error
                 perror("execve");
                 free(command);
                 exit(EXIT_FAILURE);
