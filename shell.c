@@ -1,8 +1,5 @@
 #include "main.h"
 
-#define MAX_ARGS 64
-#define MAX_PATH_LENGTH 1024
-
 /**
  * read_command - Reads a command from the user and returns it as a string.
  * Return:
@@ -39,42 +36,19 @@ char *read_command(void)
  * Terminates 'args' array with NULL.
  */
 
-void parse_arguments(char *command, char **args) {
-    int arg_count = 0;
-    char *token;
-    const char *delimiters = " \t\n";
-	char *end_quote;
-	size_t len;
+void parse_arguments(char *command, char **args)
+{
+	int arg_count = 0;
+	char *token;
 
-    token = strtok(command, delimiters);
+	token = strtok(command, " ");
 
-    while (token != NULL && arg_count < MAX_ARGS - 1) {
-         if (token[0] == '\"') {
-            end_quote = strchr(token + 1, '\"');
-            while (end_quote == NULL && arg_count < MAX_ARGS - 1) {
-                args[arg_count] = token;
-                arg_count++;
-
-                token = strtok(NULL, delimiters);
-                if (token == NULL) break;
-
-                end_quote = strchr(token, '\"');
-            }
-
-            if (end_quote != NULL) {
-                len = end_quote - token + 1;
-                args[arg_count] = malloc(len);
-                strncpy(args[arg_count], token, len - 1);
-                args[arg_count][len - 1] = '\0';
-                arg_count++;
-            }
-        } else {
-            args[arg_count] = strdup(token);
-            arg_count++;
-            token = strtok(NULL, delimiters);
-        }
-    }
-    args[arg_count] = NULL;
+	while (token != NULL && arg_count < 63)
+	{
+		args[arg_count++] = token;
+		token = strtok(NULL, " ");
+	}
+	args[arg_count] = NULL;
 }
 
 /**
@@ -87,80 +61,53 @@ void parse_arguments(char *command, char **args) {
  */
 
 
+void execute_command(char *command)
+{
+	pid_t pid = fork();
 
-int command_exists(const char *command) {
-    char *path_env = getenv("PATH");
-    char *path_copy = strdup(path_env);
-    char *path_dir;
-    char full_path[MAX_PATH_LENGTH];
+	if (pid == -1)
+	{
+		perror("fork");
+		free(command);
+		exit(EXIT_FAILURE);
+	}
+	else if (pid == 0)
+	{
+		char *args[64];
 
-	
-  if (strchr(command, '/') != NULL) {
-         if (access(command, F_OK) == 0) {
-            return 1;
-        } else {
-		  return 0;
-        }
-    }
+		parse_arguments(command, args);
 
-   if (path_copy == NULL) {
-        perror("strdup");
-        exit(EXIT_FAILURE);
-    }
+		if (args[0] == NULL)
+		{
+			free(command);
+			exit(EXIT_SUCCESS);
+		}
 
-
-    path_dir = strtok(path_copy, ":");
-    while (path_dir != NULL) {
-        snprintf(full_path, sizeof(full_path), "%s/%s", path_dir, command);
-
-        if (access(full_path, F_OK) == 0) {
-            free(path_copy);
-            return 1;
-        }
-
-        path_dir = strtok(NULL, ":");
-    }
-
-    free(path_copy);
-    return 0;
+		if (strcmp(args[0], "env") == 0)
+		{
+			char **env = environ;
+			while(*env != NULL)
+			{
+				printf("%s\n", *env);
+				env++;
+			}
+			free(command);
+			exit(EXIT_SUCCESS);
+		}
+		if (execve(args[0], args, NULL) == -1)
+		{
+			perror("execve");
+			free(command);
+			exit(EXIT_FAILURE);
+		}
+	}
+	else
+	{
+		waitpid(pid, NULL, 0);
+		free(command);
+	}
 }
 
-
-
-void execute_command(char *command) {
-    pid_t pid;
-    char *args[MAX_ARGS];
-
-    if (!command_exists(command)) {
-        printf("%s: command not found\n", command);
-        free(command);
-        return;
-    }
-
-    pid = fork();
-
-    if (pid == -1) {
-        perror("fork");
-        free(command);
-        exit(EXIT_FAILURE);
-    } else if (pid == 0) {
-        parse_arguments(command, args);
-
-        if (args[0] == NULL) {
-            free(command);
-            exit(EXIT_SUCCESS);
-        }
-
-        if (execvp(args[0], args) == -1) {
-            perror("execvp");
-            free(command);
-            exit(EXIT_FAILURE);
-        }
-    } else {
-        waitpid(pid, NULL, 0);
-        free(command);
-    }
-}
 
 /**
  * main - Basic shell interface for continuous command execution.
