@@ -87,7 +87,6 @@ void execute_command(char *command) {
         }
 
         if (strcmp(args[0], "exit") == 0) {
-            // 'exit' komutu sadece bellek temizliği yaparak işleme alınıyor
             free(command);
             exit(EXIT_SUCCESS);
         }
@@ -102,14 +101,12 @@ void execute_command(char *command) {
 
         waitpid(pid, &status, 0);
 
-        // Eğer çocuk process exit komutu ile sonlandıysa, status değerini 0 yap
         if (WIFEXITED(status) && WEXITSTATUS(status) == 0 && strcmp(command, "exit") == 0) {
             status = 0;
         }
 
         free(command);
 
-        // 'exit' komutu girildiğinde çocuk process'i sonlandırmadan doğrudan dönebiliriz
         if (strcmp(command, "exit") == 0) {
             exit(status);
         }
