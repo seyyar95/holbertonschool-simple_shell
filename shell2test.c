@@ -91,6 +91,7 @@ void execute_command(char *command)
         else
         {
             char *path = _getenv("PATH");
+	    char *token;
 	  
             if (path == NULL)
             {
@@ -99,7 +100,7 @@ void execute_command(char *command)
                 exit(EXIT_FAILURE);
             }
 
-            char *token = strtok(path, ":");
+            token = strtok(path, ":");
             while (token != NULL)
             {
                 char executable_path[256];
