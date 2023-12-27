@@ -10,6 +10,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
+extern char **environ;
 char *read_command(void);
 void parse_arguments(char *command, char **args);
 void execute_command(char *command);

@@ -82,6 +82,18 @@ void execute_command(char *command)
 			free(command);
 			exit(EXIT_SUCCESS);
 		}
+
+		if (strcmp(args[0], "env") == 0)
+		{
+			char **env = environ;
+			while(*env != NULL)
+			{
+				printf("%s\n", *env);
+				env++;
+			}
+			free(command);
+			exit(EXIT_SUCCESS);
+		}
 		if (execve(args[0], args, NULL) == -1)
 		{
 			perror("execve");
