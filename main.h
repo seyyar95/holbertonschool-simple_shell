@@ -14,6 +14,8 @@ extern char **environ;
 char *read_command(void);
 void parse_arguments(char *command, char **args);
 void execute_command(char *command);
+char *_getenv(const char *name);
 int main(void);
+
 
 #endif
