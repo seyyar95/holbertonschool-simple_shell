@@ -165,7 +165,7 @@ int main(void)
 	 if (strcmp(command, "exit") == 0)
         {
             free(command);
-            exit(0);
+            exit(2);
         }
 
 
