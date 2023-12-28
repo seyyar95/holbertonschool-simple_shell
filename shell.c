@@ -158,6 +158,13 @@ int main(void)
         {
             break;
         }
+
+	if (access(command,F_OK) == -1 && strcmp(command, "exit\n") ==0)
+	{
+		free(command);
+		exit(2);
+	}
+
         if (strcmp(command, "exit") == 0)
         {
             free(command);
