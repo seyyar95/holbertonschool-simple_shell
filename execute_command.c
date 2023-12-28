@@ -51,6 +51,7 @@ int execute_command(char *command)
         else
         {
             char *path = getenv("PATH");
+	    char *token;
 
             if (path == NULL)
             {
@@ -59,12 +60,12 @@ int execute_command(char *command)
                 exit(127);
             }
 
-            char *token = strtok(path, ":");
+            token = strtok(path, ":");
             while (token != NULL)
             {
                 char executable_path[256];
                 int len = snprintf(executable_path, sizeof(executable_path), "%s/%s", token, args[0]);
-                if (len >= sizeof(executable_path))
+                if (len >= (int)sizeof(executable_path))
                 {
                     fprintf(stderr, "Executable path truncated. Increase buffer size.\n");
                     free(command);
