@@ -161,16 +161,10 @@ int main(void)
         }
 
 	 if (strcmp(command, "exit") == 0)
-		{
-		      		free(command);
-    
-					if (is_piped && strcmp("/bin/ls /test_hbtn exit", command)==0){
-					  exit(2);
-					}
-					else{
-					  exit(0);
-					}
-		}
+	 {
+		 free(command);
+		 exit(0);
+	 }
 
 
         status = execute_command(command);
