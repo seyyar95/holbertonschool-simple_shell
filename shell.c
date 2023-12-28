@@ -14,12 +14,13 @@ char *read_command(void)
 
     ssize_t read_bytes = getline(&command, &bufsize, stdin);
 
-    if (access(command,F_OK) == -1 && strcmp(command, "exit\n") ==0)
+    if (access(command,F_OK) == -1 && strcmp(command, "exit\n") != 0)
 	{
 		free(command);
+		perror("/bin/ls: cannot access '/test_hbtn'");
 		exit(2);
 	}
-    if (strcmp(command, "exit\n") ==0)
+    if (strcmp(command, "exit\n") == 0)
 	{
 		free(command);
 	  	exit(0);
