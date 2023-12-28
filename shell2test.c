@@ -120,9 +120,9 @@ void execute_command(char *command)
             }
         }
 
-        fprintf(stderr, "Command not found: %s\n", args[0]);
+        fprintf(stderr, "./hsh: 1: %s: not found\n", args[0]);
         free(command);
-        exit(EXIT_FAILURE);
+        exit(127);
     }
     else
     {
