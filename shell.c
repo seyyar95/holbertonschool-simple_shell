@@ -98,7 +98,7 @@ int execute_command(char *command)
 	    {
 		    fprintf(stderr, "./hsh: 1: %s: not found\n", args[0]);
 		    free(command);
-		    exit(127);
+		    exit(2);
 	    }
 
             token = strtok(path, ":");
