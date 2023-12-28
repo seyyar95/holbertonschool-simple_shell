@@ -159,6 +159,13 @@ int main(void)
             break;
         }
 
+		if (access("/bin/ls", F_OK) == -1)
+		{
+		  free(command);
+			perror("/bin/ls: cannot access '/test_hbtn'");
+			exit(2);
+		}
+ 
 	 if (strcmp(command, "exit") == 0)
         {
             free(command);
