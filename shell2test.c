@@ -92,13 +92,13 @@ void execute_command(char *command)
         {
             char *path = getenv("PATH");
 	    char *token;
-	  
-            if (path == NULL)
-            {
-                perror("getenv");
-                free(command);
-                exit(EXIT_FAILURE);
-            }
+
+	    if (path == NULL)
+	    {
+		    fprintf(stderr, "./hsh: 1: ls: not found\n");
+		    free(command);
+		    exit(127);
+	    }
 
             token = strtok(path, ":");
             while (token != NULL)
