@@ -90,12 +90,12 @@ void execute_command(char *command)
         }
         else
         {
-            char *path = _getenv("PATH");
+            char *path = getenv("PATH");
 	    char *token;
 	  
             if (path == NULL)
             {
-                perror("_getenv");
+                perror("getenv");
                 free(command);
                 exit(EXIT_FAILURE);
             }
