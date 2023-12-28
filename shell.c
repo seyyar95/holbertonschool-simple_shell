@@ -170,11 +170,6 @@ int main(void)
             break;
         }
 
-        if (strcmp(command, "exit") == 0)
-        {
-            free(command);
-            exit(0);
-        }
 
         status = execute_command(command);
     }
