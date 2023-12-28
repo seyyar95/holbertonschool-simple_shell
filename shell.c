@@ -14,7 +14,7 @@ char *read_command(void)
 
     ssize_t read_bytes = getline(&command, &bufsize, stdin);
 
-    if (access(command,F_OK) == -1 && strcmp(command, "exit\n") != 0)
+    if (access(command,F_OK) == -1 && strcmp(command, "exit") == 0)
 	{
 		free(command);
 		perror("/bin/ls: cannot access '/test_hbtn'");
@@ -135,7 +135,7 @@ int execute_command(char *command)
 
         fprintf(stderr, "./hsh: 1: %s: not found\n", args[0]);
         free(command);
-        exit(127);
+        exit(2);
     }
     else
     {
