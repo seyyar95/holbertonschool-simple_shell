@@ -18,7 +18,7 @@ char *read_command(void)
     if (read_bytes == -1)
     {
         free(command);
-        return (NULL);
+        exit(2);
     }
     if (command[read_bytes - 1] == '\n')
         command[read_bytes - 1] = '\0';
@@ -73,7 +73,7 @@ int execute_command(char *command)
                 env++;
             }
             free(command);
-            exit(EXIT_SUCCESS);
+            exit(2);
         }
 
         
