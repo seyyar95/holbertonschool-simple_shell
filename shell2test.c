@@ -110,12 +110,6 @@ int execute_command(char *command)
                 if (access(executable_path, X_OK) == 0)
                 {
 			execve(executable_path, args, NULL);
-                    //if (execve(executable_path, args, NULL) == -1)
-                    //{
-                       // perror("execve");
-                        //free(command);
-                        //exit(EXIT_FAILURE);
-                    //}
                 }
 
                 token = strtok(NULL, ":");
