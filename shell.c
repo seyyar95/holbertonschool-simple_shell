@@ -5,6 +5,8 @@
 #include <string.h>
 #include "main.h"
 
+
+
 char *read_command(void)
 {
     char *command = NULL;
@@ -40,8 +42,8 @@ void parse_arguments(char *command, char **args)
 
 int execute_command(char *command)
 {
-    int status = 0;
-    pid_t pid = fork();
+	int status = 0;
+	pid_t pid = fork();
 
     if (pid == -1)
     {
@@ -74,24 +76,66 @@ int execute_command(char *command)
         }
 
         
-        execvp(args[0], args);
+        if (strchr(args[0], '/') != NULL)
+        {
+		
+            if (access(args[0], X_OK) == 0)
+            {
+                if (execve(args[0], args, environ) == -1)
+                {
+                    perror("execve");
+                    free(command);
+                    exit(EXIT_FAILURE);
+                }
+            }
+        }
+        else
+        {
+            char *path = getenv("PATH");
+	    char *token;
 
-        
-        perror("execvp");
+	    if (path == NULL)
+	    {
+		    fprintf(stderr, "./hsh: 1: %s: not found\n", args[0]);
+		    free(command);
+		    exit(127);
+	    }
+
+            token = strtok(path, ":");
+            while (token != NULL)
+            {
+                char executable_path[256];
+                snprintf(executable_path, sizeof(executable_path), "%s/%s", token, args[0]);
+
+                if (access(executable_path, X_OK) == 0)
+                {
+                    if (execve(executable_path, args, environ) == -1)
+                    {
+                        perror("execve");
+                        free(command);
+                        exit(EXIT_FAILURE);
+                    }
+                }
+
+                token = strtok(NULL, ":");
+            }
+        }
+
+        fprintf(stderr, "./hsh: 1: %s: not found\n", args[0]);
         free(command);
-        exit(EXIT_FAILURE);
+        exit(127);
     }
     else
     {
         waitpid(pid, &status, 0);
         free(command);
-        if (WIFEXITED(status))
-            status = WEXITSTATUS(status);
-        else
-            status = 1;
+	if (WIFEXITED(status))
+		status = WEXITSTATUS(status);
+	else
+		status = 1;
     }
 
-    return status;
+    return (status);
 }
 
 int main(void)
