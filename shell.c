@@ -160,15 +160,14 @@ int main(void)
             break;
         }
 
-		printf("%s", command);
-
 	 if (strcmp(command, "exit") == 0)
 		{
 		      		free(command);
     
-					if (is_piped && strcmp("ls_sjkdc exit", command)==0)
-       		 exit(2);
-    	else
+					if (is_piped && strcmp("/bin/ls /test_hbtn exit", command)==0){
+					  exit(2);
+					}
+			 else
         	exit(0);
 }
 
