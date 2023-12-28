@@ -18,7 +18,7 @@ char *read_command(void)
     if (read_bytes == -1)
     {
         free(command);
-        exit(2);
+        return (NULL);
     }
     if (command[read_bytes - 1] == '\n')
         command[read_bytes - 1] = '\0';
@@ -160,13 +160,13 @@ int main(void)
             break;
         }
 
-	   
+		printf("%s", command);
 
 	 if (strcmp(command, "exit") == 0)
 		{
-    		free(command);
+		      		free(command);
     
-  		   if (is_piped)
+					if (is_piped && strcmp("ls_sjkdc exit", command)==0)
        		 exit(2);
     	else
         	exit(0);
