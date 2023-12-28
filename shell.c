@@ -61,7 +61,7 @@ int execute_command(char *command)
         if (args[0] == NULL)
         {
             free(command);
-            exit(2);
+            exit(EXIT_SUCCESS);
         }
 
         if (strcmp(args[0], "env") == 0)
@@ -73,7 +73,7 @@ int execute_command(char *command)
                 env++;
             }
             free(command);
-            exit(2);
+            exit(EXIT_SUCCESS);
         }
 
         
@@ -161,12 +161,16 @@ int main(void)
         }
 
 	   
- 
+
 	 if (strcmp(command, "exit") == 0)
-        {
-            free(command);
-            exit(2);
-        }
+		{
+    		free(command);
+    
+  		   if (is_piped)
+       		 exit(2);
+    	else
+        	exit(0);
+}
 
 
         status = execute_command(command);
