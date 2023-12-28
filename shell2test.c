@@ -95,7 +95,7 @@ void execute_command(char *command)
 
 	    if (path == NULL)
 	    {
-		    fprintf(stderr, "./hsh: 1: ls: not found\n");
+		    fprintf(stderr, "./hsh: 1: %s: not found\n", args[0]);
 		    free(command);
 		    exit(127);
 	    }
