@@ -19,6 +19,11 @@ char *read_command(void)
 		free(command);
 		exit(2);
 	}
+    if (strcmp(command, "exit\n") ==0)
+	{
+		free(command);
+	  	exit(0);
+	}
 
     if (read_bytes == -1)
     {
