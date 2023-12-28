@@ -14,12 +14,6 @@ char *read_command(void)
 
     ssize_t read_bytes = getline(&command, &bufsize, stdin);
 
-	if (strcmp("/bin/ls /test_hbtn exit | ./hsh", command ) == 0)
-        {
-          free(command);
-            perror("/bin/ls: cannot access '/test_hbtn'");
-            exit(2);
-        }
 	
     if (read_bytes == -1)
     {
@@ -67,7 +61,7 @@ int execute_command(char *command)
         if (args[0] == NULL)
         {
             free(command);
-            exit(EXIT_SUCCESS);
+            exit(2);
         }
 
         if (strcmp(args[0], "env") == 0)
