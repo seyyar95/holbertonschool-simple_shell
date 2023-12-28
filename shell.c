@@ -14,6 +14,12 @@ char *read_command(void)
 
     ssize_t read_bytes = getline(&command, &bufsize, stdin);
 
+    if (access(command,F_OK) == -1 && strcmp(command, "exit\n") ==0)
+	{
+		free(command);
+		exit(2);
+	}
+
     if (read_bytes == -1)
     {
         free(command);
@@ -158,12 +164,6 @@ int main(void)
         {
             break;
         }
-
-	if (access(command,F_OK) == -1 && strcmp(command, "exit\n") ==0)
-	{
-		free(command);
-		exit(2);
-	}
 
         if (strcmp(command, "exit") == 0)
         {
