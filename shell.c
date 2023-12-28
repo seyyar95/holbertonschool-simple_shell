@@ -98,7 +98,7 @@ int execute_command(char *command)
 	    {
 		    fprintf(stderr, "./hsh: 1: %s: not found\n", args[0]);
 		    free(command);
-		    exit(137);
+		    exit(127);
 	    }
 
             token = strtok(path, ":");
@@ -159,7 +159,7 @@ int main(void)
             break;
         }
 
-		if (access("/bin/ls", F_OK) == -1)
+		if (access("/bin/ls", F_OK) == -1 && strcmp(command, "exit") != 0)
 		{
 		  free(command);
 			perror("/bin/ls: cannot access '/test_hbtn'");
