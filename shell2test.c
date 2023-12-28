@@ -40,9 +40,10 @@ void parse_arguments(char *command, char **args)
     args[arg_count] = NULL;
 }
 
-void execute_command(char *command)
+int execute_command(char *command)
 {
-    pid_t pid = fork();
+	int status = 0;
+	pid_t pid = fork();
 
     if (pid == -1)
     {
@@ -126,15 +127,22 @@ void execute_command(char *command)
     }
     else
     {
-        waitpid(pid, NULL, 0);
+        waitpid(pid, &status, 0);
         free(command);
+	if (WIFEXITED(status))
+		status = WEXITSTATUS(status);
+	else
+		status = 1;
     }
+
+    return (status);
 }
 
 int main(void)
 {
     int is_piped = !isatty(fileno(stdin));
     char *command;
+    int status = 0;
 
     while (1)
     {
@@ -156,7 +164,7 @@ int main(void)
             exit(0);
         }
 
-        execute_command(command);
+        status = execute_command(command);
     }
-    return (0);
+    return (status);
 }
