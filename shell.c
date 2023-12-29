@@ -1,11 +1,11 @@
 
 #include "main.h"
 
-/*
- * read_command - Reads a command from the user's input.
+/**
+ * read_command - reads command
  *
- * Returns:
- * - A string containing the command, or NULL if an error occurs.
+ * Return: string containing the command,
+ * or NULL if an error occurs.
  */
 
 char *read_command(void)
@@ -24,12 +24,12 @@ char *read_command(void)
 	return (command);
 }
 
-/*
- * parse_arguments - Parses a command string into individual arguments.
+/**
+ * parse_arguments - parse arguments
  *
- * Arguments:
- * - command: The command string to parse.
- * -  args: An array of strings to store the parsed arguments.
+ *
+ *@command: The command string to parse.
+ *@args: An array of strings to store the parsed arguments.
  */
 
 void parse_arguments(char *command, char **args)
@@ -47,14 +47,14 @@ void parse_arguments(char *command, char **args)
 	args[arg_count] = NULL;
 }
 
-/*
- * execute_command - Executes a given command.
+/**
+ * execute_command - executes command
  *
- * Arguments:
- *  - command: The command string to execute.
+ * 
+ *@command: The command string to execute.
  *
- * Returns:
- *  - The exit status of the executed command, or -1 if an error occurs.
+ * Return: the exit status of the executed command,
+ * or -1 if an error occurs.
  */
 
 int execute_command(char *command)
@@ -149,11 +149,11 @@ int execute_command(char *command)
 	return (status);
 }
 
-/*
- * main - Main function of the shell.
+/**
+ * main - Entry poin
  *
  * Reads commands from the user and executes them.
- * Returns: status
+ * Return: status
  */
 
 int main(void)
