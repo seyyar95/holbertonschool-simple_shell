@@ -1,61 +1,52 @@
-.TH SHELL 1 "December 2023" "Version 1.0" "User Commands"
+.TH hsh 1 "December 2023" "Version 1.0" "hsh Manual"
 
 .SH NAME
-shell \- a basic shell interface for continuous command execution
+hsh \- simple shell for executing commands
 
 .SH SYNOPSIS
-.B shell
+.B hsh
 
 .SH DESCRIPTION
-The \fBshell\fP program is a simple shell interface that allows users to execute commands continuously. It prompts and executes user commands until the user exits or encounters an end-of-file (EOF).
+.B hsh
+is a simple shell program that reads commands from the user and executes them.
 
-When executed without any arguments, \fBshell\fP displays the command prompt "#cisfun$ " and waits for user input. It then reads the user's command, executes it, and repeats the process until the user exits.
+.SH FUNCTIONS
+.IP \fBread_command()\fR
+Reads a command from the standard input.
 
-If \fBshell\fP is receiving input from a pipe, it omits the command prompt and continuously reads and executes commands from the input stream.
+.IP \fBparse_arguments(command, args)\fR
+Parses the command string into arguments.
 
-.SH COMMANDS
-.TP
-.B exit
-Exits the \fBshell\fP shell.
+.IP \fBexecute_command(command)\fR
+Executes the given command string.
 
-.SH INTERACTIVE MODE
-In interactive mode, \fBshell\fP provides a command prompt for the user to enter commands. It displays "#cisfun$ " and waits for the user to input a command. The user can enter any valid shell command, and \fBshell\fP will execute it.
+.IP \fBprint_environment()\fR
+Prints the environment variables.
 
-.SH NON-INTERACTIVE MODE
-When \fBshell\fP is part of a pipeline and receiving input from a pipe, it operates in non-interactive mode. In this mode, it continuously reads commands from the input stream and executes them without displaying the command prompt.
+.IP \fBexecute_from_path(command, args)\fR
+Executes the command from the PATH environment variable.
 
 .SH RETURN VALUE
-The \fBshell\fP program always returns 0 upon successful completion.
+The functions return the exit status of the executed command or -1 if an error occurs.
 
 .SH EXAMPLES
-.TP
-.B 1.
-Run \fBshell\fP interactively:
-.BR $ shell
-BR #cisfun$ ls
-file1 file2 file3
-BR #cisfun$ exit
+To execute a command, use the hsh program as follows:
 
-.TP
-.B 2.
-Use \fBshell\fP in a pipeline:
-.BR $ echo "ls" | shell
-file1 file2 file3
+.B hsh
+command
 
-.SH AUTHORS
+.SH AUTHOR
 Written by Sayyar Heydarov and Hamid Hamidbeyli.
 
+
 .SH SEE ALSO
-The \fBshell\fP program is a basic shell interface. For more information on the functions and system calls used in this shell, refer to the following manual pages:
+.BR sh (1),
+.BR execve (2),
+.BR getenv (3).
 
-.BR fork(2),
-.BR waitpid(2),
-.BR execve(2),
-.BR getline(3),
-.BR strtok(3),
-.BR isatty(3),
-.BR fflush(3),
-.BR free(3),
-.BR perror(3).
+.SH COPYRIGHT
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
 
-Additionally, for general information on Unix commands and system calls, see the respective manual pages or online documentation.
+.SH NOTES
+This man page is based on the hsh program developed for executing shell commands.
