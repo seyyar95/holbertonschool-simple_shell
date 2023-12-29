@@ -33,6 +33,8 @@ int execute_command(char *command)
 		if (strcmp(args[0], "env") == 0)
 		{
 			print_environment();
+			free(command);
+			exit(EXIT_SUCCESS);
 		}
 		if (execute_from_path(args[0], args) == 0)
 		{
@@ -64,7 +66,6 @@ void print_environment(void)
 		printf("%s\n", *env);
 		env++;
 	}
-	exit(EXIT_SUCCESS);
 }
 
 /**
@@ -89,20 +90,24 @@ int execute_from_path(char *command, char *args[])
 		char *path = getenv("PATH");
 		char *token;
 
-		if (path != NULL)
+		if (path == NULL)
 		{
-			token = strtok(path, ":");
-			while (token != NULL)
-			{
-				char exec_path[256];
+			fprintf(stderr, "./hsh: 1: %s: not found\n", args[0]);
+			free(command);
+			exit(127);
+		}
+		token = strtok(path, ":");
 
-				snprintf(exec_path, sizeof(exec_path), "%s/%s", token, command);
-				if (access(exec_path, X_OK) == 0)
-				{
-					return (execve(exec_path, args, environ));
-				}
-				token = strtok(NULL, ":");
+		while (token != NULL)
+		{
+			char exec_path[256];
+
+			snprintf(exec_path, sizeof(exec_path), "%s/%s", token, command);
+			if (access(exec_path, X_OK) == 0)
+			{
+				return (execve(exec_path, args, environ));
 			}
+			token = strtok(NULL, ":");
 		}
 	}
 	fprintf(stderr, "./hsh: 1: %s: not found\n", command);
