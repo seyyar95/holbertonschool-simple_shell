@@ -202,7 +202,7 @@ void execute_absolute_path_command(char **args)
  */
 void wait_and_free(char *command, int *status)
 {
-	pid_t pid = waitpid(-1, status, 0);
+	waitpid(-1, status, 0);
 
 	free(command);
 	if (WIFEXITED(*status))
