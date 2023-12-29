@@ -1,7 +1,6 @@
 
 #include "main.h"
-#define MAX_ARGS 64
-#define MAX_PATH_LENGTH 256
+
 /**
  * read_command - reads command
  *
@@ -58,84 +57,96 @@ void parse_arguments(char *command, char **args)
  * or -1 if an error occurs.
  */
 
-void execute_env_command() {
-    char **env = environ;
+int execute_command(char *command)
+{
+	int status = 0;
+	pid_t pid = fork();
 
-    while (*env != NULL) {
-        printf("%s\n", *env);
-        env++;
-    }
-    exit(EXIT_SUCCESS);
-}
+	if (pid == -1)
+	{
+		perror("fork");
+		free(command);
+		exit(EXIT_FAILURE);
+	}
+	else if (pid == 0)
+	{
+		char *args[64];
 
-void execute_found_executable(char *executable_path, char *args[]) {
-    if (execve(executable_path, args, environ) == -1) {
-        perror("execve");
-        exit(EXIT_FAILURE);
-    }
-}
+		parse_arguments(command, args);
+		if (args[0] == NULL)
+		{
+			free(command);
+			exit(EXIT_SUCCESS);
+		}
+		if (strcmp(args[0], "env") == 0)
+		{
+			char **env = environ;
 
-void execute_path_command(char *args[]) {
-    char *path = getenv("PATH");
-    char *token;
+			while (*env != NULL)
+			{
+				printf("%s\n", *env);
+				env++;
+			}
+			free(command);
+			exit(EXIT_SUCCESS);
+		}
+		if (strchr(args[0], '/') != NULL)
+		{
+			if (access(args[0], X_OK) == 0)
+			{
+				if (execve(args[0], args, environ) == -1)
+				{
+					perror("execve");
+					free(command);
+					exit(EXIT_FAILURE);
+				}
+			}
+		}
+		else
+		{
+			char *path = getenv("PATH");
+			char *token;
 
-    if (path == NULL) {
-        fprintf(stderr, "./hsh: 1: %s: not found\n", args[0]);
-        exit(127);
-    }
+			if (path == NULL)
+			{
+				fprintf(stderr, "./hsh: 1: %s: not found\n", args[0]);
+				free(command);
+				exit(127);
+			}
+			token = strtok(path, ":");
 
-    token = strtok(path, ":");
+			while (token != NULL)
+			{
+				char executable_path[256];
 
-    while (token != NULL) {
-        char executable_path[256];
+				snprintf(executable_path, sizeof(executable_path), "%s/%s", token, args[0]);
+				if (access(executable_path, X_OK) == 0)
+				{
+					if (execve(executable_path, args, environ) == -1)
+					{
+						perror("execve");
+						free(command);
+						exit(EXIT_FAILURE);
+					}
+				}
 
-        snprintf(executable_path, sizeof(executable_path), "%s/%s", token, args[0]);
-        if (access(executable_path, X_OK) == 0) {
-            execute_found_executable(executable_path, args);
-        }
-
-        token = strtok(NULL, ":");
-    }
-
-    fprintf(stderr, "./hsh: 1: %s: not found\n", args[0]);
-    exit(127);
-}
-
-int execute_command(char *command) {
-    int status = 0;
-    pid_t pid = fork();
-
-    if (pid == -1) {
-        perror("fork");
-        free(command);
-        exit(EXIT_FAILURE);
-    } else if (pid == 0) {
-        char *args[64];
-
-        parse_arguments(command, args);
-        if (args[0] == NULL) {
-            free(command);
-            exit(EXIT_SUCCESS);
-        }
-        if (strcmp(args[0], "env") == 0) {
-            execute_env_command();
-        } else if (strchr(args[0], '/') != NULL) {
-            if (access(args[0], X_OK) == 0) {
-                execute_found_executable(args[0], args);
-            }
-        } else {
-            execute_path_command(args);
-        }
-    } else {
-        waitpid(pid, &status, 0);
-        free(command);
-        if (WIFEXITED(status)) {
-            status = WEXITSTATUS(status);
-        } else {
-            status = 1;
-        }
-    }
-    return status;
+				token = strtok(NULL, ":");
+			}
+		}
+		fprintf(stderr, "./hsh: 1: %s: not found\n", args[0]);
+		free(command);
+		exit(127);
+	}
+	else
+	{
+		waitpid(pid, &status, 0);
+		free(command);
+		if (WIFEXITED(status))
+			status = WEXITSTATUS(status);
+		else
+			status = 1;
+	}
+	return (status);
 }
 
 /**
