@@ -14,6 +14,8 @@ extern char **environ;
 char *read_command(void);
 void parse_arguments(char *command, char **args);
 int execute_command(char *command);
+void print_environment(void);
+int execute_from_path(char *command, char *args[]);
 int main(void);
 
 
