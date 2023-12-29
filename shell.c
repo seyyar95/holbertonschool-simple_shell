@@ -57,7 +57,14 @@ void parse_arguments(char *command, char **args)
 }
 
 
-
+/**
+ * execute_external_command - Execute an external command from given arguments
+ * @args: Array of strings for command and its arguments
+ *
+ * Tries to execute an external command from PATH directories.
+ * If found and executable, executes; otherwise, displays an error
+ * and exits with status code 127 on failure.
+ */
 
 void execute_external_command(char **args)
 {
@@ -90,6 +97,12 @@ void execute_external_command(char **args)
 	exit(127);
 }
 
+/**
+ * execute_command_child - Execute command in a child process
+ * @args: Array of strings for command and its arguments
+ * @command: Command string
+ *
+ */
 void execute_command_child(char **args, char *command)
 {
 	if (args[0] == NULL)
@@ -104,6 +117,16 @@ void execute_command_child(char **args, char *command)
 	else
 		execute_external_command(args);
 }
+
+
+/**
+ * execute_command - Execute a command via forking process
+ * @command: Command string to be executed
+ *
+ * Forks a process to execute a given command, waits for its
+ * completion, and returns its status.
+ * Return: Child process exit status or error code if fork fails.
+ */
 
 int execute_command(char *command)
 {
@@ -128,6 +151,13 @@ int execute_command(char *command)
 	return (status);
 }
 
+
+/**
+ * execute_env_command - Display environment variables
+ *
+ * Displays environment variables using a while loop
+ * and exits with success status.
+ */
 void execute_env_command(void)
 {
 	char **env = environ;
@@ -139,6 +169,15 @@ void execute_env_command(void)
 	}
 	exit(EXIT_SUCCESS);
 }
+
+
+/**
+ * execute_absolute_path_command - Execute command by absolute path
+ * @args: Array of strings containing command and its arguments
+ *
+ * Executes command by its absolute path if executable; otherwise,
+ * executes as an external command.
+ */
 
 void execute_absolute_path_command(char **args)
 {
@@ -153,6 +192,14 @@ void execute_absolute_path_command(char **args)
 	execute_external_command(args);
 }
 
+/**
+ * wait_and_free - Wait for child process and free command
+ * @command: Command string to be freed
+ * @status: Pointer to status of child process
+ *
+ * Waits for child process to complete, frees the command string,
+ * and updates status based on child process exit status.
+ */
 void wait_and_free(char *command, int *status)
 {
 	pid_t pid = waitpid(-1, status, 0);
@@ -163,9 +210,6 @@ void wait_and_free(char *command, int *status)
 	else
 		*status = 1;
 }
-
-
-
 
 
 /**
