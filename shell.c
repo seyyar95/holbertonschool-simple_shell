@@ -179,6 +179,10 @@ int main(void)
 			exit(0);
 		}
 		status = execute_command(command);
+		if (status == 2)
+		{
+			exit(2);
+		}
 	}
 	return (status);
 }
