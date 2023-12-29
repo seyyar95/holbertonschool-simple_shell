@@ -12,7 +12,18 @@
 int execute_command(char *command)
 {
 	int status = 0;
-	pid_t pid = fork();
+	pid_t pid;
+	char *args[64];
+
+	parse_arguments(command, args);
+
+	if(args[0] == NULL)
+	{
+		free(command);
+		exit(EXIT_SUCCESS);
+	}
+
+	pid = fork();
 
 	if (pid == -1)
 	{
@@ -22,14 +33,6 @@ int execute_command(char *command)
 	}
 	else if (pid == 0)
 	{
-		char *args[64];
-
-		parse_arguments(command, args);
-		if (args[0] == NULL)
-		{
-			free(command);
-			exit(EXIT_SUCCESS);
-		}
 		if (strcmp(args[0], "env") == 0)
 		{
 			print_environment();
