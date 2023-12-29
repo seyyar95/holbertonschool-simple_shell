@@ -46,9 +46,9 @@ int execute_command(char *command)
 	else
 	{
 		waitpid(pid, &status, 0);
-		free(command);
 		status = WIFEXITED(status) ? WEXITSTATUS(status) : 1;
 	}
+	free(command);
 	return (status);
 }
 
