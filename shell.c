@@ -60,11 +60,12 @@ void parse_arguments(char *command, char **args)
 
 void execute_env_command() {
     char **env = environ;
-    
+
     while (*env != NULL) {
         printf("%s\n", *env);
         env++;
     }
+    exit(EXIT_SUCCESS);
 }
 
 void execute_found_executable(char *executable_path, char *args[]) {
@@ -74,7 +75,7 @@ void execute_found_executable(char *executable_path, char *args[]) {
     }
 }
 
-void execute_command_in_path(char *args[]) {
+void execute_path_command(char *args[]) {
     char *path = getenv("PATH");
     char *token;
 
@@ -86,7 +87,7 @@ void execute_command_in_path(char *args[]) {
     token = strtok(path, ":");
 
     while (token != NULL) {
-        char executable_path[MAX_PATH_LENGTH];
+        char executable_path[256];
 
         snprintf(executable_path, sizeof(executable_path), "%s/%s", token, args[0]);
         if (access(executable_path, X_OK) == 0) {
@@ -109,7 +110,7 @@ int execute_command(char *command) {
         free(command);
         exit(EXIT_FAILURE);
     } else if (pid == 0) {
-        char *args[MAX_ARGS];
+        char *args[64];
 
         parse_arguments(command, args);
         if (args[0] == NULL) {
@@ -123,11 +124,8 @@ int execute_command(char *command) {
                 execute_found_executable(args[0], args);
             }
         } else {
-            execute_command_in_path(args);
+            execute_path_command(args);
         }
-
-        free(command);
-        exit(127);
     } else {
         waitpid(pid, &status, 0);
         free(command);
