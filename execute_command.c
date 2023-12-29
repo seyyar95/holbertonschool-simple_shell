@@ -17,11 +17,10 @@ int execute_command(char *command)
 
 	parse_arguments(command, args);
 
-	if(args[0] == NULL)
+	if (args[0] == NULL)
 	{
 		free(command);
-		exit(EXIT_SUCCESS);
-	}
+		exit(EXIT_SUCCESS); }
 
 	pid = fork();
 
@@ -29,8 +28,7 @@ int execute_command(char *command)
 	{
 		perror("fork");
 		free(command);
-		exit(EXIT_FAILURE);
-	}
+		exit(EXIT_FAILURE); }
 	else if (pid == 0)
 	{
 		if (strcmp(args[0], "env") == 0)
