@@ -177,9 +177,13 @@ int main(void)
 		if (strcmp(command, "exit") == 0)
 		{
 			free(command);
-			exit(is_piped ? 2 : 0);
+			exit(0);
 		}
 		status = execute_command(command);
+		if (status == 2 && is_piped)
+		{
+			exit(2);
+		}
 	}
 	return (status);
 }
