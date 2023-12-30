@@ -1,5 +1,5 @@
 # C - Simple Shell Group Project
-Team: Sayyar Heydarov, Hamid Hamidbeyli
+Team: Sayyar Heydarov, Hamid Hamidbayli
 
 ## Requirements
 
