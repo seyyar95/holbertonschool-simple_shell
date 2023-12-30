@@ -100,7 +100,6 @@ void search_and_execute(char *args[], char *command)
  *
  * Return: The exit status of the executed command.
  */
-
 int execute_command(char *command)
 {
 	int status = 0;
@@ -151,7 +150,6 @@ int execute_command(char *command)
  *
  * Return: The exit status of the program.
  */
-
 int main(void)
 {
 	int is_piped = !isatty(fileno(stdin));
