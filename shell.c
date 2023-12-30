@@ -5,7 +5,6 @@
  *
  * Return: A dynamically allocated string containing the command.
  */
-
 char *read_command(void)
 {
 	char *command = NULL;
@@ -28,7 +27,6 @@ char *read_command(void)
  * @command: The command string to be parsed.
  * @args: An array to store the parsed arguments.
  */
-
 void parse_arguments(char *command, char **args)
 {
 	int arg_count = 0;
@@ -50,7 +48,6 @@ void parse_arguments(char *command, char **args)
  * @args: An array containing the command and its arguments.
  * @command: The original command string.
  */
-
 void search_and_execute(char *args[], char *command)
 {
 	if (strchr(args[0], '/') != NULL)
