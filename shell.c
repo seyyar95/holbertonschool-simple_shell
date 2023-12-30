@@ -92,7 +92,6 @@ void search_and_execute(char *args[], char *command)
 	free(command);
 	exit(127); }
 
-
 /**
  * execute_command - Executes the given command.
  *
