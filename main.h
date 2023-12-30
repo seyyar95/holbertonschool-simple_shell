@@ -17,5 +17,4 @@ int execute_command(char *command);
 void search_and_execute(char *args[], char *command);
 int main(void);
 
-
 #endif
